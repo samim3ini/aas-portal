@@ -9,8 +9,9 @@ const AddEmployee: React.FC = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [department, setDepartment] = useState('');
-  const [image, setImage] = useState<File | null>(null); // State for image file
-  const [preview, setPreview] = useState<string | null>(null); // State for image preview
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Store API error messages
   const navigate = useNavigate();
 
   // Handle image upload and convert image to Base64 string
@@ -20,9 +21,8 @@ const AddEmployee: React.FC = () => {
       setImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        // Convert file to Base64 string
-        const base64 = reader.result?.toString().split(',')[1]; // Remove the data:image/* part
-        setPreview(URL.createObjectURL(file)); // Preview for the user
+        const base64 = reader.result?.toString().split(',')[1];
+        setPreview(URL.createObjectURL(file));
       };
       reader.readAsDataURL(file);
     }
@@ -39,7 +39,7 @@ const AddEmployee: React.FC = () => {
 
     const reader = new FileReader();
     reader.onloadend = async () => {
-      const base64 = reader.result?.toString().split(',')[1]; // Base64 string of the image
+      const base64 = reader.result?.toString().split(',')[1];
 
       const formData = {
         employeeID,
@@ -47,7 +47,7 @@ const AddEmployee: React.FC = () => {
         email,
         phoneNumber,
         department,
-        imageBase64: base64, // Add the Base64 string here
+        imageBase64: base64,
       };
 
       try {
@@ -61,11 +61,14 @@ const AddEmployee: React.FC = () => {
           }
         );
         console.log(response.data);
-        // Redirect back to the Manage Employees page
-        navigate('/');
-      } catch (error) {
+        navigate('/'); // Redirect on success
+      } catch (error: any) {
         console.error('Error submitting employee data:', error);
-        alert('An error occurred while submitting the employee data.');
+        if (error.response && error.response.data) {
+          setErrorMessage(error.response.data.error || 'An unknown error occurred.');
+        } else {
+          setErrorMessage('Network error. Please check your connection.');
+        }
       }
     };
     reader.readAsDataURL(image);
@@ -78,12 +81,7 @@ const AddEmployee: React.FC = () => {
         {/* Image Upload Field */}
         <div className="form-group">
           <label>Employee Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            required
-          />
+          <input type="file" accept="image/*" onChange={handleImageChange} required />
           {preview && (
             <div className="image-preview">
               <img src={preview} alt="Employee Preview" />
@@ -94,63 +92,47 @@ const AddEmployee: React.FC = () => {
         {/* Employee ID Field */}
         <div className="form-group">
           <label>Employee ID</label>
-          <input
-            type="text"
-            value={employeeID}
-            onChange={(e) => setEmployeeID(e.target.value)}
-            required
-          />
+          <input type="text" value={employeeID} onChange={(e) => setEmployeeID(e.target.value)} required />
         </div>
 
         {/* Full Name Field */}
         <div className="form-group">
           <label>Full Name</label>
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
+          <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </div>
 
         {/* Email Field */}
         <div className="form-group">
           <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
 
         {/* Phone Number Field */}
         <div className="form-group">
           <label>Phone Number</label>
-          <input
-            type="text"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-          />
+          <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
         </div>
 
         {/* Department Field */}
         <div className="form-group">
           <label>Department</label>
-          <input
-            type="text"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            required
-          />
+          <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)} required />
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className="submit-button">
-          Add Employee
-        </button>
+        <button type="submit" className="submit-button">Add Employee</button>
       </form>
+
+      {/* Error Popup Modal */}
+      {errorMessage && (
+        <div className="error-popup">
+          <div className="error-content">
+            <h3>Error</h3>
+            <p>{errorMessage}</p>
+            <button onClick={() => setErrorMessage(null)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
