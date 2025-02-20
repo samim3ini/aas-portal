@@ -1,0 +1,69 @@
+.manage-employees {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.employee-table th,
+.employee-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.employee-table th {
+  background-color: #f8f9fa;
+}
+
+.employee-image {
+  width: 50px;
+  height: 50px;
+  background-color: #ccc;
+  border-radius: 50%;
+}
+
+.edit-button,
+.delete-button,
+.save-button {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.save-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.add-employee-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #28a745;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.add-employee-link:hover {
+  background-color: #218838;
+}
