@@ -9,7 +9,7 @@ interface Employee {
   email: string;
   phoneNumber: string;
   department: string;
-  imageS3Key: string;
+  imageBase64: string;
 }
 
 const API_URL = 'https://rjjunsawi4.execute-api.us-east-1.amazonaws.com/test/manageEmployees';
@@ -65,8 +65,15 @@ const ManageEmployees: React.FC = () => {
           {employees.map((employee) => (
             <tr key={employee.employeeID}>
               <td>
-                <img src={`https://employees-facial-images.s3.amazonaws.com/${employee.imageS3Key}`} alt="Employee" width="50" />
-              </td>
+                {employee.imageBase64 ? (
+                  <img
+                    src={`data:image/jpeg;base64,${employee.imageBase64}`}
+                    alt="Employee"
+                    width="50"
+                  />
+                ) : (
+                  <img src="/placeholder.png" alt="No Image" width="50" />
+                )}              </td>
               <td>{employee.fullName}</td>
               <td>{employee.email}</td>
               <td>{employee.phoneNumber}</td>
