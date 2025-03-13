@@ -1,51 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './ManageEmployees.css';
 
 interface Employee {
-  id: number;
-  name: string;
+  employeeID: string;
+  fullName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   department: string;
-  timePresent: string;
-  leavingTime: string;
+  imageS3Key: string;
 }
 
+const API_URL = 'https://rjjunsawi4.execute-api.us-east-1.amazonaws.com/test/manageEmployees';
+
 const ManageEmployees: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: 1,
-      name: 'مفرح معيني',
-      email: 'm.f.muain@gmail.com',
-      phone: '0507523904',
-      department: 'oret',
-      timePresent: '09:00 AM',
-      leavingTime: '05:00 PM',
-    },
-    // Add more employees as needed
-  ]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
-  // Handle delete employee
-  const handleDelete = (id: number) => {
-    setEmployees(employees.filter((employee) => employee.id !== id));
+  const fetchEmployees = () => {
+    axios.get(API_URL)
+      .then((response) => setEmployees(response.data))
+      .catch((error) => console.error('Error fetching employees:', error));
   };
 
-  // Handle edit employee
-  const handleEdit = (employee: Employee) => {
-    setEditingEmployee(employee);
+  const handleDelete = (employeeID: string) => {
+    axios.delete(`${API_URL}/${employeeID}`)
+      .then(() => setEmployees(employees.filter(emp => emp.employeeID !== employeeID)))
+      .catch((error) => console.error('Error deleting employee:', error));
   };
 
-  // Handle save edited employee
-  const handleSaveEdit = (updatedEmployee: Employee) => {
-    setEmployees(
-      employees.map((employee) =>
-        employee.id === updatedEmployee.id ? updatedEmployee : employee
-      )
-    );
-    setEditingEmployee(null); // Exit edit mode
+  const handleEdit = async (employeeID: string, updatedData: Partial<Employee>) => {
+    try {
+      await axios.put(`${API_URL}/${employeeID}`, updatedData, {
+        headers: { "Content-Type": "application/json" }
+      });
+
+      alert("Employee updated successfully!");
+      fetchEmployees(); // Refresh the list after update
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      alert("Failed to update employee.");
+    }
   };
 
   return (
@@ -59,145 +58,28 @@ const ManageEmployees: React.FC = () => {
             <th>Email</th>
             <th>Phone</th>
             <th>Department</th>
-            <th>Time Present</th>
-            <th>Leaving Time</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {employees.map((employee) => (
-            <tr key={employee.id}>
+            <tr key={employee.employeeID}>
               <td>
-                <div className="employee-image"></div> {/* Placeholder for image */}
+                <img src={`https://employees-facial-images.s3.amazonaws.com/${employee.imageS3Key}`} alt="Employee" width="50" />
               </td>
+              <td>{employee.fullName}</td>
+              <td>{employee.email}</td>
+              <td>{employee.phoneNumber}</td>
+              <td>{employee.department}</td>
               <td>
-                {editingEmployee?.id === employee.id ? (
-                  <input
-                    type="text"
-                    value={editingEmployee.name}
-                    onChange={(e) =>
-                      setEditingEmployee({
-                        ...editingEmployee,
-                        name: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  employee.name
-                )}
-              </td>
-              <td>
-                {editingEmployee?.id === employee.id ? (
-                  <input
-                    type="email"
-                    value={editingEmployee.email}
-                    onChange={(e) =>
-                      setEditingEmployee({
-                        ...editingEmployee,
-                        email: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  employee.email
-                )}
-              </td>
-              <td>
-                {editingEmployee?.id === employee.id ? (
-                  <input
-                    type="text"
-                    value={editingEmployee.phone}
-                    onChange={(e) =>
-                      setEditingEmployee({
-                        ...editingEmployee,
-                        phone: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  employee.phone
-                )}
-              </td>
-              <td>
-                {editingEmployee?.id === employee.id ? (
-                  <input
-                    type="text"
-                    value={editingEmployee.department}
-                    onChange={(e) =>
-                      setEditingEmployee({
-                        ...editingEmployee,
-                        department: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  employee.department
-                )}
-              </td>
-              <td>
-                {editingEmployee?.id === employee.id ? (
-                  <input
-                    type="text"
-                    value={editingEmployee.timePresent}
-                    onChange={(e) =>
-                      setEditingEmployee({
-                        ...editingEmployee,
-                        timePresent: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  employee.timePresent
-                )}
-              </td>
-              <td>
-                {editingEmployee?.id === employee.id ? (
-                  <input
-                    type="text"
-                    value={editingEmployee.leavingTime}
-                    onChange={(e) =>
-                      setEditingEmployee({
-                        ...editingEmployee,
-                        leavingTime: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  employee.leavingTime
-                )}
-              </td>
-              <td>
-                {editingEmployee?.id === employee.id ? (
-                  <button
-                    className="save-button"
-                    onClick={() => handleSaveEdit(editingEmployee)}
-                  >
-                    Save
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      className="edit-button"
-                      onClick={() => handleEdit(employee)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="delete-button"
-                      onClick={() => handleDelete(employee.id)}
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}
+                <button className="delete-button" onClick={() => handleDelete(employee.employeeID)}>Delete</button>
+                <button className="edit-button" onClick={() => handleEdit(employee.employeeID, { fullName: 'Updated Name' })}>Edit</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <Link to="/add-employee" className="add-employee-link">
-        Add Employee
-      </Link>
+      <Link to="/add-employee" className="add-employee-link">Add Employee</Link>
     </div>
   );
 };

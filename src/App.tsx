@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
 import ManageEmployees from './pages/ManageEmployees';
 import AddEmployee from './pages/AddEmployee';
-import Settings from './pages/Setting';
+import CheckEmployees from './pages/CheckEmployees';
 import Logout from './pages/Logout';
 
 function App() {
-  const { signOut } = useAuthenticator();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to control sidebar visibility
   
   const toggleSidebar = () => {
@@ -16,7 +14,6 @@ function App() {
   };
 
   return (
-    <main>
       <Router>
       <div className="app-container">
         {/* Header with Menu Icon and System Name */}
@@ -36,8 +33,8 @@ function App() {
             <Link to="/" className="nav-link" onClick={toggleSidebar}>
               Manage Employees
             </Link>
-            <Link to="/settings" className="nav-link" onClick={toggleSidebar}>
-              Settings
+            <Link to="/employee-status" className="nav-link" onClick={toggleSidebar}>
+              Employee Status
             </Link>
             <Link to="/logout" className="nav-link" onClick={toggleSidebar}>
               Logout
@@ -50,14 +47,12 @@ function App() {
           <Routes>
             <Route path="/" element={<ManageEmployees />} />
             <Route path="/add-employee" element={<AddEmployee />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/employee-status" element={<CheckEmployees />} />
             <Route path="/logout" element={<Logout />} />
           </Routes>
         </div>
       </div>
     </Router>
-      <button onClick={signOut}>Sign out</button>
-    </main>
   );
 }
 
