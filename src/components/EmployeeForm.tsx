@@ -71,6 +71,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSubmit, onCa
             onChange={(e) => setEmployeeID(e.target.value)}
             required
             disabled={isEditing}
+            autoFocus
           />
         </Grid2>
         <Grid2 size={{ xs: 12, sm: 6 }}>
